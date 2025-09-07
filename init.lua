@@ -1,6 +1,5 @@
 -- Set <space> as the leader key
 -- See `:help mapleader`
---  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
@@ -8,20 +7,16 @@ vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.o`
--- NOTE: You can change these options as you wish!
 
 vim.o.number = true
 vim.o.relativenumber = true
 
--- Enable mouse mode, can be useful for resizing splits for example!
 vim.o.mouse = 'a'
 
--- Don't show the mode, since it's already in the status line
 vim.o.showmode = false
 
 -- Sync clipboard between OS and Neovim.
 --  Schedule the setting after `UiEnter` because it can increase startup-time.
---  Remove this option if you want your OS clipboard to remain independent.
 --  See `:help 'clipboard'`
 vim.schedule(function()
   vim.o.clipboard = 'unnamedplus'
@@ -30,6 +25,10 @@ end)
 vim.o.breakindent = true
 
 vim.o.undofile = true
+
+-- Turn off netrw
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
 
 -- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
 vim.o.ignorecase = true
@@ -146,7 +145,6 @@ require('lazy').setup({
   -- 'github/copilot.vim',
   -- 'Olical/conjure', -- Clojure REPL
   -- 'jez/vim-better-sml', -- SML syntax highlighting
-  'NMAC427/guess-indent.nvim', -- Detect tabstop and shiftwidth automatically
 
   -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
@@ -539,7 +537,6 @@ require('lazy').setup({
       local capabilities = require('blink.cmp').get_lsp_capabilities()
 
       -- Enable the following language servers
-      --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
       --
       --  Add any additional override configuration in the following tables. Available keys are:
       --  - cmd (table): Override the default command used to start the server
@@ -548,7 +545,6 @@ require('lazy').setup({
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
-        -- clangd = {},
         gopls = {},
         pyright = {
           settings = {
@@ -598,12 +594,6 @@ require('lazy').setup({
         bashls = {},
       }
 
-      -- Ensure the servers and tools above are installed
-      --
-      -- To check the current status of installed tools and/or manually install
-      -- other tools, you can run
-      --    :Mason
-      --
       -- You can press `g?` for help in this menu.
       --
       -- `mason` had to be setup earlier: to configure its options see the
@@ -676,13 +666,12 @@ require('lazy').setup({
       end,
       formatters_by_ft = {
         lua = { 'stylua' },
-        javascript = { 'prettierd', stop_after_first = true },
-        javascriptreact = { 'prettierd', stop_after_first = true },
-        typescript = { 'prettierd', stop_after_first = true },
-        typescriptreact = { 'prettierd', stop_after_first = true },
+        javascript = { 'prettierd' },
+        javascriptreact = { 'prettierd' },
+        typescript = { 'prettierd' },
+        typescriptreact = { 'prettierd' },
         python = { 'isort', 'black' },
-        go = { 'goimports', 'gofumpt' },
-        -- You can use 'stop_after_first' to run the first available formatter from the list
+        go = { 'gofumpt', 'goimports' },
       },
     },
   },
@@ -836,8 +825,18 @@ require('lazy').setup({
         return '%2l:%-2v'
       end
 
-      -- ... and there is more!
-      --  Check out: https://github.com/echasnovski/mini.nvim
+      require('mini.files').setup {
+        mappings = {
+          go_in_plus = '<CR>',
+          go_out = 'h',
+          close = 'q',
+        },
+        options = { use_as_default_explorer = true },
+      }
+      -- Keymap to open file explorer at current file
+      vim.keymap.set('n', '<leader>e', function()
+        require('mini.files').open(vim.api.nvim_buf_get_name(0))
+      end, { desc = 'Open Mini Files at current file' })
     end,
   },
   { -- Highlight, edit, and navigate code
@@ -846,7 +845,28 @@ require('lazy').setup({
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
+      ensure_installed = {
+        'bash',
+        'c',
+        'diff',
+        'go',
+        'gomod',
+        'gosum',
+        'html',
+        'javascript',
+        'lua',
+        'luadoc',
+        'markdown',
+        'markdown_inline',
+        'query',
+        'vim',
+        'vimdoc',
+        'json',
+        'toml',
+        'typescript',
+        'tsx',
+        'yaml',
+      },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
