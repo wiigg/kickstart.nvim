@@ -161,6 +161,14 @@ require('lazy').setup({
       },
     },
   },
+  { -- gc/gcc style commenting
+    'numToStr/Comment.nvim',
+    keys = {
+      { 'gc', mode = { 'n', 'x' } },
+      { 'gb', mode = { 'n', 'x' } },
+    },
+    opts = {},
+  },
 
   -- Plugins can also lazy-load on events instead of loading at startup.
   -- Here `event = 'VimEnter'` means the plugin loads once the UI is ready.
