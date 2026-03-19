@@ -484,6 +484,7 @@ require('lazy').setup({
       -- Keep a server as `{}` when the defaults are fine, and add `settings`, `filetypes`, or `capabilities` when needed.
       -- For example, `lua_ls` exposes extra settings at https://luals.github.io/wiki/settings/
       local servers = {
+        biome = {},
         gopls = {
           settings = {
             gopls = {
@@ -527,12 +528,6 @@ require('lazy').setup({
             },
           },
         },
-        eslint = {
-          filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
-          settings = {
-            format = false,
-          },
-        },
         bashls = {},
       }
 
@@ -542,8 +537,6 @@ require('lazy').setup({
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
         'markdownlint-cli2',
-        'prettierd',
-        'eslint-lsp',
         'gofumpt',
         'goimports',
       })
@@ -598,10 +591,10 @@ require('lazy').setup({
       end,
       formatters_by_ft = {
         lua = { 'stylua' },
-        javascript = { 'prettierd' },
-        javascriptreact = { 'prettierd' },
-        typescript = { 'prettierd' },
-        typescriptreact = { 'prettierd' },
+        javascript = { 'biome-organize-imports', 'biome' },
+        javascriptreact = { 'biome-organize-imports', 'biome' },
+        typescript = { 'biome-organize-imports', 'biome' },
+        typescriptreact = { 'biome-organize-imports', 'biome' },
         python = { 'ruff_organize_imports', 'ruff_format' },
         go = { 'gofumpt', 'goimports' },
       },
