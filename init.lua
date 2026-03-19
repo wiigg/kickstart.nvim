@@ -484,7 +484,15 @@ require('lazy').setup({
       -- Keep a server as `{}` when the defaults are fine, and add `settings`, `filetypes`, or `capabilities` when needed.
       -- For example, `lua_ls` exposes extra settings at https://luals.github.io/wiki/settings/
       local servers = {
-        gopls = {},
+        gopls = {
+          settings = {
+            gopls = {
+              staticcheck = true,
+              usePlaceholders = true,
+            },
+          },
+        },
+        marksman = {},
         pyright = {
           settings = {
             python = {
@@ -533,6 +541,7 @@ require('lazy').setup({
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
+        'markdownlint-cli2',
         'prettierd',
         'eslint-lsp',
         'gofumpt',
@@ -597,6 +606,27 @@ require('lazy').setup({
         go = { 'gofumpt', 'goimports' },
       },
     },
+  },
+  { -- Linting for filetypes where standalone tools are a better fit than LSP diagnostics
+    'mfussenegger/nvim-lint',
+    event = { 'BufReadPre', 'BufNewFile' },
+    config = function()
+      local lint = require 'lint'
+
+      lint.linters_by_ft = {
+        markdown = { 'markdownlint-cli2' },
+      }
+
+      local lint_augroup = vim.api.nvim_create_augroup('kickstart-lint', { clear = true })
+      vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWritePost', 'InsertLeave' }, {
+        group = lint_augroup,
+        callback = function()
+          if vim.bo.filetype == 'markdown' then
+            lint.try_lint()
+          end
+        end,
+      })
+    end,
   },
 
   { -- Autocompletion
