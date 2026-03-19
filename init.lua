@@ -453,6 +453,11 @@ require('lazy').setup({
           --
           -- When you move your cursor, the highlights will be cleared (the second autocommand).
           local client = vim.lsp.get_client_by_id(event.data.client_id)
+          if client and client.name == 'ruff' then
+            -- Prefer Pyright for hover while keeping Ruff for diagnostics, fixes, and formatting.
+            client.server_capabilities.hoverProvider = false
+          end
+
           if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight, event.buf) then
             local highlight_augroup = vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = false })
             vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
@@ -551,12 +556,7 @@ require('lazy').setup({
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
-        -- Some languages (like typescript) have entire language plugins that can be useful:
-        --    https://github.com/pmizio/typescript-tools.nvim
-        --
-        -- But for many setups, the LSP (`ts_ls`) will work just fine
-        -- ts_ls = {},
-        --
+        ts_ls = {},
 
         lua_ls = {
           -- cmd = { ... },
@@ -593,7 +593,6 @@ require('lazy').setup({
         'stylua', -- Used to format Lua code
         'prettierd',
         'eslint-lsp',
-        'typescript-language-server',
         'gofumpt',
         'goimports',
       })
@@ -627,6 +626,9 @@ require('lazy').setup({
         desc = '[F]ormat buffer',
       },
     },
+    init = function()
+      vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
+    end,
     opts = {
       notify_on_error = false,
       format_on_save = function(bufnr)
