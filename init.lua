@@ -344,6 +344,7 @@ require('lazy').setup({
       { 'mason-org/mason.nvim', opts = {} },
       'mason-org/mason-lspconfig.nvim',
       'WhoIsSethDaniel/mason-tool-installer.nvim',
+      'b0o/SchemaStore.nvim',
 
       -- Useful status updates for LSP.
       { 'j-hui/fidget.nvim', opts = {} },
@@ -484,12 +485,24 @@ require('lazy').setup({
       -- Keep a server as `{}` when the defaults are fine, and add `settings`, `filetypes`, or `capabilities` when needed.
       -- For example, `lua_ls` exposes extra settings at https://luals.github.io/wiki/settings/
       local servers = {
-        biome = {},
+        biome = {
+          filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
+        },
         gopls = {
           settings = {
             gopls = {
               staticcheck = true,
               usePlaceholders = true,
+            },
+          },
+        },
+        jsonls = {
+          settings = {
+            json = {
+              format = { enable = true },
+              -- SchemaStore adds completion and validation for common JSON files like package.json and tsconfig.json.
+              schemas = require('schemastore').json.schemas(),
+              validate = { enable = true },
             },
           },
         },
