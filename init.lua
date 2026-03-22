@@ -773,17 +773,7 @@ require('lazy').setup({
         'yaml',
       }
 
-      local ok, treesitter = pcall(require, 'nvim-treesitter')
-      if not ok or type(treesitter.install) ~= 'function' then
-        require('nvim-treesitter.configs').setup {
-          ensure_installed = parsers,
-          auto_install = true,
-          highlight = { enable = true },
-          indent = { enable = true },
-        }
-        return
-      end
-
+      local treesitter = require 'nvim-treesitter'
       treesitter.install(parsers)
       vim.api.nvim_create_autocmd('FileType', {
         callback = function(args)
